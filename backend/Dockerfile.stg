@@ -13,7 +13,7 @@ RUN ./gradlew dependencies --no-daemon
 
 # 소스 및(있다면) .env 복사 (.env가 없어도 빌드는 진행됨)
 COPY src src
-#COPY .env .env
+COPY .env .env
 
 # 테스트 제외 빌드 → app.jar 생성
 RUN ./gradlew build --no-daemon -x test
