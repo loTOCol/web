@@ -48,4 +48,4 @@ jobs:
           file: ./backend/Dockerfile.stg 
           push: true
           tags: |
-            ghcr.io/${{ env.OWNER_LC }}/backend-deploy:latest  # 태그 제거, latest만
+            ghcr.io/${{ env.OWNER_LC }}/backend-deploy:latest
