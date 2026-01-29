@@ -3,7 +3,7 @@ name: deploy-stg
 on:
   push:
     branches:
-      - develop
+      - main
     paths:
       - '.github/workflows/**'
       - 'backend/src/**'
