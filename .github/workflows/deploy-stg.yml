@@ -61,7 +61,8 @@ jobs:
       - name: 빌드 앤 푸시
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: ./backend                 # backend 디렉터리 전체를 컨텍스트로
+          file: ./backend/Dockerfile.stg 
           push: true
           tags: |
             ghcr.io/${{ env.OWNER_LC }}/backend-deploy:${{ needs.makeTagAndRelease.outputs.tag_name }},
