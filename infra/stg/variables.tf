@@ -10,5 +10,5 @@ variable "region" {
 
 variable "nickname" {
   description = "nickname"
-  default     = "jhs512"
+  default     = "cyb"
 }

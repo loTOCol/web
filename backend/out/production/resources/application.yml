@@ -1,3 +1,5 @@
+# application.yml
+
 server:
   port: 8080
 
@@ -16,9 +18,9 @@ spring:
         highlight_sql: false    # 콘솔 색상 강조
         use_sql_comments: false # JPQL → SQL 주석 표시
 
-  profiles:                    # 현재 실행 중인 프로필
+  profiles: # 현재 실행 중인 프로필
     include: secret            # 항상 같이 로드할 프로필
-    active: dev-mysql # dev: h2, dev-mysql: mysql
+    active: dev # dev,dev-mysql
 
   output:
     ansi:
@@ -29,6 +31,21 @@ logging:
     ansi:
       enabled: always
 
+custom:
+  dev:
+    domain: localhost
+    frontUrl: "http://${custom.dev.cookieDomain}:3000"
+    backUrl: "http://${custom.dev.cookieDomain}:${server.port}"
+  prod:
+    domain: app.choiyb.shop
+    frontUrl: "https://www.${custom.prod.cookieDomain}"
+    backUrl: "https://api.${custom.prod.cookieDomain}"
+#  site:
+#    cookieDomain: "${custom.dev.cookieDomain}"
+#    frontUrl: "${custom.dev.frontUrl}"
+#    backUrl: "${custom.dev.backUrl}"
+#    name: GLOG
+
 ---
 
 # 운영 환경(prod)
@@ -37,3 +54,4 @@ spring:
   config:
     activate:
       on-profile: prod
+
