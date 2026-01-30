@@ -47,7 +47,9 @@ jobs:
       - name: application-secret.yml 생성
         env:
           APPLICATION_SECRET: ${{ secrets.APPLICATION_SECRET }}
-        run: echo "$APPLICATION_SECRET" > src/main/resources/application-secret.yml
+        run: |
+          mkdir -p backend/src/main/resources
+          printf '%s' "$APPLICATION_SECRET" > backend/src/main/resources/application-secret.yml
 
       - name: Docker Buildx 설치
         uses: docker/setup-buildx-action@v2
