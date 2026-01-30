@@ -2,16 +2,16 @@
 
 spring:
   datasource:
-    url: jdbc:mysql://mysql_1:3306/myweb_stg?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: myweb_stg_user
-    #password: ${custom.stg.db.password}
+    url: jdbc:mysql://mysql_1:3306/glog_prod
+    username: ldjlocal
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   data:
     redis:
-      host: redis_1
-      port: 6379
-      password: ${custom.stg.redis.password}
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:${custom.stg.redis.password:}}
 
   jpa:
     hibernate:
@@ -19,6 +19,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         default_batch_fetch_size: 100
 
