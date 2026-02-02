@@ -1,4 +1,4 @@
-package com.example.demo.domain.user;
+package com.example.demo.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -37,11 +37,6 @@ public class User {
         validate(email,password);
 
         return new User(email,password);
-
-//        User user = new User();
-//        user.email = email;
-//        user.password = password;
-//        return user;
     }
 
     public void updateProfile(String name, String profileImageUrl){
