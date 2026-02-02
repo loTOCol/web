@@ -17,7 +17,7 @@ import java.util.UUID;
 //@AllArgsConstructor 지양
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //기본 생성자 보호
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "post")
+@Table(name = "posts")
 public class Post {
 
     @Id
