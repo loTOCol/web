@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 public class InitDataHelper {
     private final PostRepository postRepository;
 
-    public Post createPost(String title, String content){
-        return postRepository.save(
-                Post.create(title,content)
-        );
-    }
+//    public Post createPost(String title, String content){
+//        return postRepository.save(
+//                Post.create(title,content)
+//        );
+//    }
 
 
 }

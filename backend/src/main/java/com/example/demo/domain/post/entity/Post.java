@@ -1,5 +1,6 @@
 package com.example.demo.domain.post.entity;
 
+import com.example.demo.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,6 +40,10 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User writer;
+
     //팩토리 메서드만 허용
     private Post (String title, String content){
         this.title = title;
@@ -67,6 +72,10 @@ public class Post {
             if (content == null || content.isBlank()) {
             throw new IllegalArgumentException("내용은 필수입니다.");
         }
+    }
+
+    public boolean isWrittenBy(UUID userId){
+        return writer.getId().equals(userId);
     }
 
 }
