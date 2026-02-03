@@ -1,5 +1,7 @@
 package com.example.demo.domain.user.entity;
 
+import com.example.demo.domain.user.role.Role;
+import com.example.demo.domain.user.role.UserStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,6 +30,14 @@ public class User {
 
     private String profileImageUrl;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status;
+
     private User(String email, String password){
         this.email = email;
         this.password = password;
@@ -53,5 +63,4 @@ public class User {
             throw new IllegalArgumentException("비밀번호는 필수입니다.");
         }
     }
-
 }
