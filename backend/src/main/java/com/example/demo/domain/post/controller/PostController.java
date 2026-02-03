@@ -41,25 +41,25 @@ public class PostController {
     }
 
     // 게시글 생성
-    @PostMapping
-    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid PostCreateRequest request){
-        Post post = postService.createPost(request.title(),request.content());
-        return ResponseEntity.ok(PostResponse.from(post));
-    }
-
-    // 게시글 수정
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> updatePost(@PathVariable UUID id, @RequestBody @Valid PostCreateRequest request){
-        postService.updatePost(id, request.title(), request.content());
-        return ResponseEntity.noContent().build();
-    }
-
-    // 게시글 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable UUID id){
-        postService.deletePost(id);
-        return  ResponseEntity.noContent().build();
-    }
+//    @PostMapping
+//    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid PostCreateRequest request){
+//        Post post = postService.createPost(request.title(),request.content());
+//        return ResponseEntity.ok(PostResponse.from(post));
+//    }
+//
+//    // 게시글 수정
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Void> updatePost(@PathVariable UUID id, @RequestBody @Valid PostCreateRequest request){
+//        postService.updatePost(id, request.title(), request.content());
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    // 게시글 삭제
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deletePost(@PathVariable UUID id){
+//        postService.deletePost(id);
+//        return  ResponseEntity.noContent().build();
+//    }
 
 
 }
