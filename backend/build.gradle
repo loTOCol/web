@@ -53,6 +53,11 @@ dependencies {
 
 	// aws s3 종속성 추가
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.3.0'
+
+	// JWT 라이브러리 (JWT)
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 }
 
 tasks.named('test') {
