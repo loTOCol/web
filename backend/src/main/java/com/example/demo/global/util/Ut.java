@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
@@ -48,5 +49,29 @@ public class Ut {
 
             return jwt;
         }
+
+        public static boolean isValidToken(SecretKey secretKey, String token){
+            try {
+                Jwts
+                        .parser()                // JWT 파서 생성
+                        .verifyWith(secretKey)   // 이 키로 서명 검증
+                        .build()                 // 파서 완성
+                        .parse(token);          // JWT 문자열 파싱 + 검증
+            }catch (Exception e){
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Map<String,Object> getPayload(SecretKey secretKey, String jwtStr){
+            return (Map<String, Object>) Jwts
+                    .parser()                // JWT 파서 생성
+                    .verifyWith(secretKey)   // 이 키로 서명 검증
+                    .build()                 // 파서 완성
+                    .parse(jwtStr)           // JWT 문자열 파싱 + 검증
+                    .getPayload();
+        }
+
     }
 }
