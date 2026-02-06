@@ -3,13 +3,14 @@ package com.example.demo.domain.user.entity;
 import com.example.demo.domain.user.role.Role;
 import com.example.demo.domain.user.role.UserStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.util.UUID;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="users")
 public class User {
@@ -28,6 +29,9 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String nickName;
+
     private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
@@ -38,15 +42,13 @@ public class User {
     @Column(nullable = false)
     private UserStatus status;
 
-    private User(String email, String password){
-        this.email = email;
+    // 탈퇴한 사용자 기간 내 재활성화
+    public void reactivate(String password, String name, String nickName, Role role){
         this.password = password;
-    }
-
-    public static User create(String email, String password){
-        validate(email,password);
-
-        return new User(email,password);
+        this.name = name;
+        this.nickName = nickName;
+        this.role = role;
+        this.status = UserStatus.ACTIVE;
     }
 
     public void updateProfile(String name, String profileImageUrl){
@@ -54,13 +56,8 @@ public class User {
         this.profileImageUrl = profileImageUrl;
     }
 
-    private static void validate(String email, String password){
-        if(email == null || email.isBlank()){
-            throw new IllegalArgumentException("이메일은 필수입니다.");
-        }
-
-        if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("비밀번호는 필수입니다.");
-        }
+    public void updateProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
+
 }
