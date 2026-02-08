@@ -1,4 +1,199 @@
 package com.example.demo.global.jwt;
 
+import com.example.demo.global.exception.CustomJwtException;
+import com.example.demo.global.jwt.exception.JwtInvalidSignatureException;
+import com.example.demo.global.jwt.exception.JwtMalformedTokenException;
+import com.example.demo.global.jwt.exception.JwtTokenExpiredException;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.UUID;
+
+import com.example.demo.domain.user.role.Role;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class JwtProvider {
+
+    @Value("${custom.jwt.secret-key}")
+    private String secret;
+
+
+    @Value("${custom.jwt.access-token-expire-seconds}")
+    private long accessExpirationInSeconds;
+
+    @Value("${custom.jwt.refresh-token-expire-seconds}")
+    private long refreshExpirationInSeconds;
+
+    private SecretKey key;
+
+    @PostConstruct
+    public void init() {
+        key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    // 개발용 주석임 지우지 말아줘
+//        private final SecretKey key;
+//        private final long accessExpirationInSeconds;
+//        private final long refreshExpirationInSeconds;
+//
+//        public JwtProvider(@Value("${jwt.secret}") String secret,
+//                           @Value("${jwt.access-expiration}") long accessExpirationInSeconds,
+//                           @Value("${jwt.refresh-expiration}") long refreshExpirationInSeconds) {
+    ////            this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+//            this.key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm()/*"AES"*/);
+//            this.accessExpirationInSeconds = accessExpirationInSeconds;
+//            this.refreshExpirationInSeconds = refreshExpirationInSeconds;
+//        }
+
+
+    private SecretKey getKey(){
+        return this.key;
+    }
+
+    /**
+     JWT에 만료시간이 있는데 굳이 expirationMillis를 따로 Redis에 넣는 이유
+     Redis TTL(Time-To-Live) 설정 때문
+     Redis에 저장된 리프레시 토큰은 수동으로 삭제하지 않으면 계속 남아 있기에
+     TTL을 설정하지 않으면 Redis에 영구적으로 남음.
+     내부적으로는 RedisTemplate.opsForValue().set(key, value, expirationMillis, TimeUnit.MILLISECONDS)
+     이게 Redis에 자동으로 만료되도록 설정해주는 핵심
+     리프레시 토큰 만료 시간만큼 Redis에 자동으로 남아 있도록 설정하는 역할.
+     토큰과 서버 저장소의 만료 시점을 맞추기 위해 필요
+     */
+    // 토큰 만드는 메서드
+    private String generateToken(UUID id, String email, Role role, String category, long expirationSeconds) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + expirationSeconds * 1000);
+
+        return Jwts.builder()
+                .subject(email)
+                .claim("id", id.toString())
+                .claim("role", role.name())
+                .claim("category", category)
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(key, Jwts.SIG.HS256)
+                .compact();
+    }
+
+    public String generateAccessToken(UUID id, String email, Role role) {
+        return generateToken(id, email, role, "access", accessExpirationInSeconds);
+    }
+
+    public String generateRefreshToken(UUID id, String email, Role role) {
+        return generateToken(id, email, role, "refresh", refreshExpirationInSeconds);
+    }
+
+    // 토큰 파싱하는 메서드
+    public Jws<Claims> parse(String token) {
+        try {
+            //  파서 빌더 생성(내부적으로는 DefaultJwtParserBuilder 객체를 반환)
+            return Jwts.parser()
+                    //  검증용 키 등록(JWT의 Signature를 검증)
+                    .verifyWith(getKey())
+                    //  파서 객체 완성
+                    .build()
+                    //  토큰 파싱 + 서명 검증
+                    // token 문자열을 . 기준으로 세 조각(Header, Payload, Signature)으로 나눔
+                    //Header의 alg 값을 보고 적절한 검증 방식 선택
+                    //.verifyWith(getKey())에서 지정한 키로 Signature가 유효한지 검증
+                    //검증에 성공하면 → Jws<Claims> 타입 객체 반환
+                    //Jws = JSON Web Signature (서명 포함된 JWT)
+                    //Claims = JWT payload에 담긴 클레임들
+                    //Jws<Claims>는 Header + Payload + Signature를 모두 포함한 검증된 JWT 객체
+                    .parseSignedClaims(token);
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            throw new JwtInvalidSignatureException();
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw new JwtTokenExpiredException();
+        } catch (io.jsonwebtoken.MalformedJwtException e) {
+            throw new JwtMalformedTokenException();
+        } catch (JwtException | IllegalArgumentException e) {
+            // 더 포괄적인 JWT 관련 예외 처리
+            throw new CustomJwtException("유효하지 않은 토큰입니다.", "401");
+        }
+    }
+
+    // 단순히 토큰이 유요한지 검증하는 메서드
+    public void validateToken(String token) {
+        try {
+            Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token);
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            throw new JwtInvalidSignatureException();
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw new JwtTokenExpiredException();
+        } catch (io.jsonwebtoken.MalformedJwtException e) {
+            throw new JwtMalformedTokenException();
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new CustomJwtException("유효하지 않은 토큰입니다.", "401");
+        }
+    }
+
+    public UUID extractId(String token) {
+        String idStr = parse(token).getPayload().get("id", String.class);
+        return UUID.fromString(idStr);
+    }
+
+    // 토큰에서 이메일 추출
+    public String extractEmail(String token) {
+        return parse(token).getPayload().getSubject();
+    }
+
+    // 토큰에서 권한 추출
+    public Role extractRole(String token) {
+        String roleName = parse(token).getPayload().get("role", String.class);
+        return Role.valueOf(roleName); // 문자열 → enum 변환
+    }
+
+    // 토큰의 종류를 판별
+    public String getCategory(String token) {
+        return parse(token).getPayload().get("category", String.class);
+    }
+
+    // 리프레시 토큰이 가지는 유효기간 양
+    public long getRefreshTokenExpirationInMillis() {
+        return refreshExpirationInSeconds*1000;
+    }
+
+    // 토큰의 유효기간이 얼마나 남았는지 계산
+    // 남은 유효기간동안 토큰을 블랙리스트에 넣기 위해 필요
+    public long getTokenRemainingTime(String token) {
+        Date exp = parse(token).getPayload().getExpiration();
+        return (exp.getTime() - System.currentTimeMillis()) / 1000;
+    }
+
+    // 토큰 형식 검사
+    public boolean isValid(String token) {
+        try {
+            validateToken(token);
+            return true;
+        } catch (CustomJwtException e) {
+            return false;
+        }
+    }
+
+    // 토큰의 유효기간이 안지났는지 검증
+    public Boolean isExpired(String token) {
+        return parse(token).getPayload().getExpiration().before(new Date());
+    }
+
+    // 로그아웃 시 만약 만료되지 않은 토큰이라면 파싱하고
+    // 만료된 토큰이라면 이메일을 받아오기 위해 ExpiredJwtException를 무시하고 Claims를 꺼냄
+    public String extractEmailFromExpiredToken(String token) {
+        try {
+            // 일반적인 파싱 시도
+            return parse(token).getPayload().getSubject();
+        } catch (ExpiredJwtException e) {
+            // 토큰이 만료된 경우, 예외 객체에서 Claims를 직접 얻어 이메일을 반환
+            return e.getClaims().getSubject();
+        }
+    }
+
 }
