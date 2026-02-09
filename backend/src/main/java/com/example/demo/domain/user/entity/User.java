@@ -60,4 +60,8 @@ public class User {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public void ban() {
+        this.status = UserStatus.BANNED;
+    }
+
 }
