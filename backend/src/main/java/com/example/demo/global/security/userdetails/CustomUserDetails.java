@@ -34,7 +34,7 @@ public class CustomUserDetails implements UserDetails{
     }
 
     // 토큰 인증용
-    private CustomUserDetails(UUID id, String email, Role role){
+    public CustomUserDetails(UUID id, String email, Role role){
         this.id = id;
         this.email = email;
         this.password = null; // 토큰 기반 인증 시에는 비밀번호가 필요 없음

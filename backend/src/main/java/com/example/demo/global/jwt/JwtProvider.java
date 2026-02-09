@@ -21,13 +21,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtProvider {
 
+    // HS256 서명용 비밀키
     @Value("${custom.jwt.secret-key}")
     private String secret;
 
-
+    // access token 만료 시간
     @Value("${custom.jwt.access-token-expire-seconds}")
     private long accessExpirationInSeconds;
 
+    // refresh token 만료 시간
     @Value("${custom.jwt.refresh-token-expire-seconds}")
     private long refreshExpirationInSeconds;
 
@@ -37,20 +39,6 @@ public class JwtProvider {
     public void init() {
         key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
-
-    // 개발용 주석임 지우지 말아줘
-//        private final SecretKey key;
-//        private final long accessExpirationInSeconds;
-//        private final long refreshExpirationInSeconds;
-//
-//        public JwtProvider(@Value("${jwt.secret}") String secret,
-//                           @Value("${jwt.access-expiration}") long accessExpirationInSeconds,
-//                           @Value("${jwt.refresh-expiration}") long refreshExpirationInSeconds) {
-    ////            this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-//            this.key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm()/*"AES"*/);
-//            this.accessExpirationInSeconds = accessExpirationInSeconds;
-//            this.refreshExpirationInSeconds = refreshExpirationInSeconds;
-//        }
 
 
     private SecretKey getKey(){
