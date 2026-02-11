@@ -1,7 +1,7 @@
 package com.example.demo.domain.user.entity;
 
 import com.example.demo.domain.user.role.Role;
-import com.example.demo.domain.user.role.UserStatus;
+import com.example.demo.domain.user.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -62,6 +62,10 @@ public class User {
 
     public void ban() {
         this.status = UserStatus.BANNED;
+    }
+
+    public void changePassword(String newEncodedPassword) {
+        this.password = newEncodedPassword;
     }
 
 }

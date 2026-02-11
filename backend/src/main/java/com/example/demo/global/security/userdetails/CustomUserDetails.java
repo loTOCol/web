@@ -2,7 +2,7 @@ package com.example.demo.global.security.userdetails;
 
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.role.Role;
-import com.example.demo.domain.user.role.UserStatus;
+import com.example.demo.domain.user.enums.UserStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

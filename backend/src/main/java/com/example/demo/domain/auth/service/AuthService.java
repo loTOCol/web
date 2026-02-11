@@ -7,7 +7,7 @@ import com.example.demo.domain.auth.exception.InvalidPasswordException;
 import com.example.demo.domain.auth.exception.UserNotFoundException;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.domain.user.role.Role;
-import com.example.demo.domain.user.role.UserStatus;
+import com.example.demo.domain.user.enums.UserStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +90,25 @@ public class AuthService {
     @Transactional(readOnly = true)
     public boolean isDuplicateName(String nickName) {
         return userRepository.existsBynickName(nickName);
+    }
+
+
+    /**
+     * 로그인 성공 후 처리: 필요 시 비밀번호 인코딩을 업그레이드.
+     * @param user 로그인한 사용자객체(준영속 상태)
+     * @param rawPassword 사용자가 입력한 원본 비밀번호
+     */
+    @Transactional
+    public void upgradePasswordIfNecessary(User user, String rawPassword) {
+
+        String encodedPassword = user.getPassword();
+
+        // 현재 비밀번호 인코딩이 최신 방식인지 확인
+        if (passwordEncoder.upgradeEncoding(encodedPassword)) {
+            // 최신 방식이 아니라면, 현재 입력된 비밀번호를 최신 방식으로 다시 인코딩하여 저장
+            user.changePassword(passwordEncoder.encode(rawPassword));
+            userRepository.save(user); // 준영속상태이기에 save로 영속 상태로 만들고, 변경 사항을 DB에 반영
+        }
     }
 
 }
