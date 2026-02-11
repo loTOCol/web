@@ -1,4 +1,4 @@
-package com.example.demo.domain.user.role;
+package com.example.demo.domain.user.enums;
 
 public enum UserStatus {
     ACTIVE,    // 활성
