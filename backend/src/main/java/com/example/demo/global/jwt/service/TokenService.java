@@ -1,7 +1,6 @@
 package com.example.demo.global.jwt.service;
 
 import com.example.demo.domain.auth.dto.response.TokenResponse;
-import com.example.demo.domain.auth.exception.MemberNotFoundException;
 import com.example.demo.domain.auth.exception.UserNotFoundException;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
@@ -85,7 +84,7 @@ public class TokenService {
 
 
         User user = userRepository.findById(jwtProvider.extractId(refreshToken))
-                .orElseThrow(MemberNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
 
         // 기존 refreshToken 레디스에서 삭제 처리
         deleteRefreshToken(email);
