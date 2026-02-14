@@ -59,15 +59,12 @@ public class TokenService {
     public TokenResponse reissueTokens(@CookieValue("refreshToken")String refreshToken) {
 
         if (!jwtProvider.isValid(refreshToken)) {
-            System.out.println("1");
             throw new JwtTokenExpiredException();
         }
         if(!Objects.equals(jwtProvider.getCategory(refreshToken), "refresh")) {
-            System.out.println("2");
             throw new JwtTokenExpiredException();
         }
         if(jwtProvider.isExpired(refreshToken)) {
-            System.out.println("3");
             throw new JwtTokenExpiredException();
         }
 
@@ -126,10 +123,4 @@ public class TokenService {
                 .build();
     }
 
-    // reissue시 이미 만료된 access토큰도 받아서 두 토큰 이메일 값도 비교해볼까 고민중
-    // 이러면 리프레쉬 토큰만 탈취한 해커가 리프레시토큰 단독으론 못뚫지 않나 생각하면서도
-    // 어차피 jwt라는게 암복호화가 쉬운거라 이메일 파싱해서 가짜access토큰 만들어버리면 그만이지 않나 싶음
-    private void validateRefreshToken(String refreshToken, String email) {
-        if (!Objects.equals(jwtProvider.extractEmail(refreshToken), email)) throw new JwtInvalidSignatureException();
-    }
 }
