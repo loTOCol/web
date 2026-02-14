@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,11 +46,13 @@ public class CustomUserDetails implements UserDetails{
     // 사용자의 권한 목록
     // ROLE_USER, ROLE_ADMIN 같은 값
     // 지금은 권한 설계 안 했으니 빈 리스트, 나중에 Role enum 붙이면 여기 수정
-    // TODO: 권한 정책 도입 시 ROLE 기반으로 수정
+    // TODO: 권한 정책 도입 시 ROLE 기반으로 수정 (완료)
+    // TODO: WITHDRAWAL은 권한이 아니라 상태임. UserStatus로 이동해야함
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
+
 
     // Spring Security가 비밀번호 비교할 때 호출함
     // 로그인 시 입력 비밀번호 vs DB 비밀번호
