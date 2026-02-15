@@ -35,7 +35,7 @@ management:
 
 custom:
   site:
-    domain: stg.choiyb.shop
+    domain: api.app.choiyb.shop      # stg.choiyb.shop → api.app.choiyb.shop
     backUrl: https://api.stg.choiyb.shop
     frontUrl: https://stg.choiyb.shop
 
@@ -43,6 +43,7 @@ cors:
   allowed-origins:
     - "https://stg.choiyb.shop"
     - "http://localhost:3000"
+    - "http://api.app.choiyb.shop"
     - "http://localhost:5173"
   allowed-origin-patterns:
     - "https://*.vercel.app"
