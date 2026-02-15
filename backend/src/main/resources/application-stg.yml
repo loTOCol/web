@@ -2,16 +2,16 @@
 
 spring:
   datasource:
-    url: jdbc:mysql://mysql_1:3306/glog_prod
+    url: jdbc:mysql://mysql-1:3306/myweb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: lldjlocal
-    password: 1234
+    password: ${custom.stg.db.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   data:
     redis:
       host: redis_1
       port: 6379
-      password: lldj123414
+      password: ${custom.stg.redis.password}
 
   jpa:
     hibernate:
@@ -42,7 +42,6 @@ custom:
 cors:
   allowed-origins:
     - "https://stg.choiyb.shop"
-    - "https://usw-bookfront-test.vercel.app"
     - "http://localhost:3000"
     - "http://localhost:5173"
   allowed-origin-patterns:
