@@ -187,11 +187,7 @@ public class SecurityConfig {
 
         // allowCredentials=true 인 경우, origin은 구체적으로 명시해야 함(와일드카드 불가)
         cfg.setAllowedOriginPatterns(List.of(
-                "https://stg.subook.shop",
-                "https://usw-bookfront-test.vercel.app",
-                "https://*.vercel.app",
-                "http://localhost:3000",
-                "http://127.0.0.1:3000"
+                "https://choiyb.shop"
         ));
 
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
