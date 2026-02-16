@@ -138,8 +138,7 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/signup",
                                 "/api/auth/*/exists",
-                                "/api/auth/reissue",
-                                "/api/mail/**"
+                                "/api/auth/reissue"
                         ).permitAll()
 
                         // 게시글 조회(GET)는 누구나 가능하도록 허용
@@ -187,7 +186,11 @@ public class SecurityConfig {
 
         // allowCredentials=true 인 경우, origin은 구체적으로 명시해야 함(와일드카드 불가)
         cfg.setAllowedOriginPatterns(List.of(
-                "https://choiyb.shop"
+                "https://choiyb.shop",
+                "http://api.app.choiyb.shop"
+//                "http://localhost:3000",
+//                "http://localhost:5173"
+
         ));
 
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
