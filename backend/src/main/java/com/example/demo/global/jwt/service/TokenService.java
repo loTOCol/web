@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CookieValue;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -56,7 +55,7 @@ public class TokenService {
 
     // 토큰 재발급
     @Transactional
-    public TokenResponse reissueTokens(@CookieValue("refreshToken")String refreshToken) {
+    public TokenResponse reissueTokens(String refreshToken) {
 
         if (!jwtProvider.isValid(refreshToken)) {
             throw new JwtTokenExpiredException();
