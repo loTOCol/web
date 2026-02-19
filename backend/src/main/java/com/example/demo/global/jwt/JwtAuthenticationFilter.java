@@ -1,9 +1,14 @@
 package com.example.demo.global.jwt;
 
-import com.example.demo.domain.auth.exception.BannedUserException;
+import com.example.demo.domain.user.entity.User;
+import com.example.demo.domain.user.enums.UserStatus;
+import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.domain.user.role.Role;
 import com.example.demo.global.exception.CustomJwtException;
+import com.example.demo.global.jwt.exception.JwtBlacklistedException;
 import com.example.demo.global.jwt.exception.JwtInvalidSignatureException;
+import com.example.demo.global.jwt.exception.JwtUserInactiveException;
+import com.example.demo.global.jwt.exception.JwtUserNotFoundException;
 import com.example.demo.global.jwt.service.TokenService;
 import com.example.demo.global.security.userdetails.CustomUserDetails;
 import jakarta.servlet.FilterChain;
@@ -36,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
     private final TokenService tokenService;
+    private final UserRepository userRepository;
 
     /**
      * 이 필터는 HTTP 요청이 들어올 때마다 실행됩니다. (OncePerRequestFilter)
@@ -68,6 +74,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
+            if (tokenService.isBlacklisted(token)) {
+                throw new JwtBlacklistedException();
+            }
 
             // 토큰이 만료되면 401 코드
             jwtProvider.parse(token);
@@ -79,9 +88,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = jwtProvider.extractEmail(token);
             Role role = jwtProvider.extractRole(token);
 
-            // 이방식은 DB를 조회 해야해서 성능이 떨어짐. 하지만 보안적으론 좋음
-//            User user = userRepository.findByEmail(email)
-//                    .orElseThrow(JwtUserNotFoundException::new);
+            User user = userRepository.findById(userId)
+                    .orElseThrow(JwtUserNotFoundException::new);
+
+            if (user.getStatus() != UserStatus.ACTIVE) {
+                throw new JwtUserInactiveException();
+            }
 
             // CustomUserDetails 객체를 생성(DB 조회 없이)하여 인증 주체(principal)로 사용
             CustomUserDetails customUserDetails = new CustomUserDetails(userId,email, role);
