@@ -45,16 +45,18 @@ public class Post {
     private User writer;
 
     //팩토리 메서드만 허용
-    private Post (String title, String content){
+    private Post (User writer, String title, String content){
+        this.writer = writer;
         this.title = title;
         this.content = content;
     }
 
     //아직 객체가 없는 상태에서 호출되므로 static이어야 함
-    public static Post create(String title, String content){
-        validate(title,content);
+    public static Post create(User writer, String title, String content){
+        validateWriter(writer);
+        validate(title, content);
 
-        return new Post(title,content);
+        return new Post(writer, title, content);
     }
 
     public void update(String title, String content){
@@ -69,13 +71,19 @@ public class Post {
                 throw new IllegalArgumentException("제목은 필수입니다.");
             }
 
-            if (content == null || content.isBlank()) {
+        if (content == null || content.isBlank()) {
             throw new IllegalArgumentException("내용은 필수입니다.");
         }
     }
 
+    private static void validateWriter(User writer) {
+        if (writer == null) {
+            throw new IllegalArgumentException("작성자는 필수입니다.");
+        }
+    }
+
     public boolean isWrittenBy(UUID userId){
-        return writer.getId().equals(userId);
+        return writer != null && writer.getId().equals(userId);
     }
 
 }
