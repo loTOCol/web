@@ -1,14 +1,15 @@
 package com.example.demo.domain.post.controller;
 
-//import com.example.demo.domain.post.dto.request.PostCreateRequest;
-//import com.example.demo.domain.post.dto.request.PostUpdateRequest;
 import com.example.demo.domain.post.dto.request.PostCreateRequest;
+import com.example.demo.domain.post.dto.request.PostUpdateRequest;
 import com.example.demo.domain.post.dto.response.PostResponse;
 import com.example.demo.domain.post.entity.Post;
 import com.example.demo.domain.post.service.PostService;
+import com.example.demo.global.security.userdetails.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,26 +42,35 @@ public class PostController {
     }
 
     // 게시글 생성
-//    @PostMapping
-//    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid PostCreateRequest request){
-//        Post post = postService.createPost(request.title(),request.content());
-//        return ResponseEntity.ok(PostResponse.from(post));
-//    }
-//
-//    // 게시글 수정
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Void> updatePost(@PathVariable UUID id, @RequestBody @Valid PostCreateRequest request){
-//        postService.updatePost(id, request.title(), request.content());
-//        return ResponseEntity.noContent().build();
-//    }
-//
-//    // 게시글 삭제
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deletePost(@PathVariable UUID id){
-//        postService.deletePost(id);
-//        return  ResponseEntity.noContent().build();
-//    }
+    @PostMapping
+    public ResponseEntity<PostResponse> createPost(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid PostCreateRequest request
+    ){
+        Post post = postService.createPost(userDetails.getId(), request.title(), request.content());
+        return ResponseEntity.ok(PostResponse.from(post));
+    }
+
+    // 게시글 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updatePost(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid PostUpdateRequest request
+    ){
+        postService.updatePost(id, userDetails.getId(), request.title(), request.content());
+        return ResponseEntity.noContent().build();
+    }
+
+    // 게시글 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
+        postService.deletePost(id, userDetails.getId());
+        return  ResponseEntity.noContent().build();
+    }
 
 
 }
-

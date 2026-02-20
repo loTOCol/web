@@ -38,7 +38,7 @@ public class PostService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저가 없습니다."));
 
-        Post post = Post.create(title, content); // 엔티티의 팩토리 메서드 사용
+        Post post = Post.create(user, title, content); // 작성자 포함 생성
         return postRepository.save(post); // DB에 저장 후 반환
     }
 
@@ -64,7 +64,7 @@ public class PostService {
         if(!post.isWrittenBy(userId)){
             throw new IllegalArgumentException("수정 권한이 없습니다.");
         }
-        postRepository.deleteById(postId);
+        postRepository.delete(post);
     }
 
 }
